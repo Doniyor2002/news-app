@@ -10,10 +10,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResNewsDto {
-    private UUID id;
+public class CommentDto {
+    @NotNull(message = "Name kiritish majburiy")
     private String name;
-    private String categoryName;
-    private String userName;
-    private String createDate;
+    @NotNull(message = "Category tanlash shart")
+    private UUID news_id;
 }

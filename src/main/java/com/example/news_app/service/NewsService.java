@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -32,15 +33,17 @@ import java.util.stream.Collectors;
 public class NewsService {
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final CategoryRepository categoryRepository;
     private final DateFormatter dateFormatter;
     public Apiresponse add(NewsDto newsDto) {
         News news=new News();
         Category category = categoryRepository.findById(newsDto.getCategory_id()).orElseThrow(() -> new ResourceNotFoundException("Category", "id", newsDto.getCategory_id()));
-        User user = userRepository.findById(newsDto.getUser_id()).orElseThrow(() -> new ResourceNotFoundException("User", "id", newsDto.getUser_id()));
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        User user1 = userRepository.findByPassword(credentials).orElseThrow(() -> new ResourceNotFoundException("User", "name", SecurityContextHolder.getContext().getAuthentication().getName()));
         news.setName(newsDto.getName());
         news.setCategory(category);
-        news.setUser(user);
+        news.setUser(user1);
         News save = newsRepository.save(news);
         if (save!=null){
             return Apiresponse.builder().message("Added").succes(true).data(toDto(save)).build();
@@ -65,6 +68,7 @@ public class NewsService {
     }
 
     public Apiresponse getOne(UUID id) {
+
         News news = newsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("News", "id", id));
         return Apiresponse.builder().succes(true).message("News").data(toDto(news)).build();
     }
@@ -73,9 +77,7 @@ public class NewsService {
         News news = newsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("News", "id", id));
         Category category = categoryRepository.findById(newsDto.getCategory_id()).orElseThrow(() -> new ResourceNotFoundException("Category", "id", newsDto.getCategory_id()));
         news.setCategory(category);
-        User user = userRepository.findById(newsDto.getUser_id()).orElseThrow(() -> new ResourceNotFoundException("User", "id", newsDto.getUser_id()));
         news.setName(newsDto.getName());
-        news.setUser(user);
         News save = newsRepository.save(news);
         return Apiresponse.builder().message("Updated").data(toDto(save)).succes(true).build();
     }
@@ -87,6 +89,12 @@ public class NewsService {
         }
         return Apiresponse.builder().succes(false).message("Xatolik yuz berdi").build();
     }
+    public Apiresponse getUserNews(HttpServletRequest request,int page,int size) {
+        Pageable pageable=PageRequest.of(page, size);
+        String phone = userService.getPhonetoUser(request);
+        Page<News> all = newsRepository.findAllByUser_Phone(phone,pageable);
+        return Apiresponse.builder().data(toDTOPage(all)).message("News List").succes(true).build();
+    }
 
     public ResNewsDto toDto(News news){
         ResNewsDto resNewsDto=new ResNewsDto();
@@ -94,6 +102,7 @@ public class NewsService {
         resNewsDto.setCategoryName(news.getCategory().getName());
         resNewsDto.setCreateDate(String.valueOf(news.getCreatedate()));
         resNewsDto.setUserName(news.getUser().getFullName());
+        resNewsDto.setId(news.getId());
         return resNewsDto;
     }
     public Page<ResNewsDto> toDTOPage(Page<News> newsPage) {
@@ -101,10 +110,5 @@ public class NewsService {
     return new PageImpl<>(collect);
 }
 
-    public Apiresponse getUserNews() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        List<News> all = newsRepository.findAllByUser_Password(authentication.getCredentials());
-        return Apiresponse.builder().data(all).build();
-    }
 }

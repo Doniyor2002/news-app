@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/category")
@@ -17,7 +19,7 @@ public class CategoryControler {
 
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody Category category){
+    public ResponseEntity<?> add(@Valid @RequestBody Category category){
         Apiresponse apiresponse = categoryService.add(category);
         return ResponseEntity.status(apiresponse.isSucces()?201:404).body(apiresponse);
     }
@@ -39,7 +41,7 @@ public class CategoryControler {
 
     @PreAuthorize(value = "hasAnyAuthority('ADMIN','MODERATOR')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody Category category){
+    public ResponseEntity<?> update(@PathVariable Long id,@Valid @RequestBody Category category){
         Apiresponse apiresponse = categoryService.update(category,id);
         return ResponseEntity.status(apiresponse.isSucces()?201:404).body(apiresponse);
     }

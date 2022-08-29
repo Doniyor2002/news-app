@@ -1,8 +1,8 @@
 package com.example.news_app.controller;
 
-import com.example.news_app.dto.NewsDto;
+import com.example.news_app.dto.CommentDto;
 import com.example.news_app.response.Apiresponse;
-import com.example.news_app.service.NewsService;
+import com.example.news_app.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,57 +19,54 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/news")
+@RequestMapping("/comment")
 @RequiredArgsConstructor
-public class NewsController {
-    private final NewsService newsService;
+public class CommentController {
+    private final CommentService commentService;
+
     @PreAuthorize(value = "hasAuthority('USER')")
     @PostMapping
-    public ResponseEntity<?> add(@Valid @RequestBody NewsDto newsDto){
+    public ResponseEntity<?> add(@Valid @RequestBody CommentDto commentDto){
 
-        Apiresponse apiresponse = newsService.add(newsDto);
+        Apiresponse apiresponse = commentService.add(commentDto);
         return ResponseEntity.status(apiresponse.isSucces()?201:404).body(apiresponse);
     }
-    @PreAuthorize(value = "hasAnyAuthority('ADMIN','MODERATOR','USER')")
+
+    @PreAuthorize(value = "hasAnyAuthority('ADMIN','MODERATOR')")
     @GetMapping()
     public ResponseEntity<?> getAll(@RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size,
                                     @RequestParam(defaultValue = "") String name,
-                                    @RequestParam(defaultValue = "") String categoryName,
                                     @RequestParam(defaultValue = "") String date) throws ParseException {
-
-
-        Apiresponse apiresponse=newsService.getAll(page,size,name,categoryName,date);
+        Apiresponse apiresponse=commentService.getAll(page,size,name,date);
         return ResponseEntity.ok().body(apiresponse);
     }
+
     @PreAuthorize(value = "hasAnyAuthority('ADMIN','MODERATOR','USER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getOne(@PathVariable UUID id){
-        Apiresponse apiresponse=newsService.getOne(id);
+        Apiresponse apiresponse=commentService.getOne(id);
         return ResponseEntity.ok().body(apiresponse);
     }
 
     @PreAuthorize(value = "hasAnyAuthority('ADMIN','MODERATOR','USER')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id,@Valid @RequestBody NewsDto newsDto){
-        Apiresponse apiresponse = newsService.update(newsDto,id);
+    public ResponseEntity<?> update(@PathVariable UUID id,@Valid @RequestBody CommentDto commentDto){
+        Apiresponse apiresponse = commentService.update(commentDto,id);
         return ResponseEntity.status(apiresponse.isSucces()?201:404).body(apiresponse);
     }
 
     @PreAuthorize(value = "hasAnyAuthority('ADMIN','USER')")
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id){
-        Apiresponse apiresponse=newsService.delete(id);
+        Apiresponse apiresponse=commentService.delete(id);
         return ResponseEntity.status(apiresponse.isSucces()?200:404).body(apiresponse);
     }
 
-
-    @PreAuthorize(value = "hasAuthority('USER')")
-    @GetMapping("/getNewsUser")
-    public ResponseEntity<?> getAllNewsUser(HttpServletRequest request,@RequestParam(defaultValue = "0") int page,
+    @GetMapping("/getUserComment")
+    public ResponseEntity<?> getAllUserComment(HttpServletRequest request,@RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size) throws ParseException {
-        Apiresponse apiresponse=newsService.getUserNews(request,page,size);
+        Apiresponse apiresponse=commentService.getUserComment(request,page,size);
         return ResponseEntity.ok().body(apiresponse);
     }
 

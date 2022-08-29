@@ -17,7 +17,7 @@ public class UserDto {
     private String fullName;
     private Double salary;
     @NotNull(message = "Role tanlash shart")
-    private List<String> roleName;
+    private List<Long> roleId;
     @NotNull(message = "password kiritish shart")
     private String password;
 

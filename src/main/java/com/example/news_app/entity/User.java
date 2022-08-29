@@ -23,6 +23,7 @@ import java.util.*;
 public class User extends AbsEntity implements UserDetails {
     private String fullName;
     private String phone;
+    private String email;
     private Double salary;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;

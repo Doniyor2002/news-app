@@ -31,20 +31,12 @@ public class DataLoader implements CommandLineRunner {
             Role admin = roleRepository.save(new Role(1L, "ADMIN",true));
             Role user = roleRepository.save(new Role(2L, "USER",true));
             Role moderator = roleRepository.save(new Role(3L, "MODERATOR",true));
-
-
             Set<Role> set=new HashSet<>();
             set.add(admin);
             Set<Role> set1=new HashSet<>();
             set1.add(user);
             Set<Role> set2=new HashSet<>();
             set2.add(moderator);
-//            Set<Roles> set=new HashSet<>();
-//            set.add(Roles.ADMIN);
-//            Set<Roles> set1=new HashSet<>();
-//            set1.add(Roles.ADMIN);
-//            Set<Roles> set2=new HashSet<>();
-//            set2.add(Roles.ADMIN);
 
             userResository.save(new User("Doniyor", "+998936330207", set, passwordEncoder.encode("111")));
             userResository.save(new User("Ilhom","+998901112233",set1, passwordEncoder.encode("222")));

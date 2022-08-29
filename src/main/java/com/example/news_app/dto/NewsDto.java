@@ -15,6 +15,4 @@ public class NewsDto {
     private String name;
     @NotNull(message = "Category tanlash shart")
     private Long category_id;
-    @NotNull(message = "User tanlash shart")
-    private UUID user_id;
 }

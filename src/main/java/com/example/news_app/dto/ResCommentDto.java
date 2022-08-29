@@ -10,10 +10,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResNewsDto {
-    private UUID id;
+public class ResCommentDto {
     private String name;
-    private String categoryName;
+    private String newsName;
     private String userName;
     private String createDate;
+
 }
